@@ -37,7 +37,7 @@ service /identity on new http:Listener(8081) {
     isolated resource function get requests/[string id]() returns IdentityRequest|error {
         return getRequest(id);
     }
-        isolated resource function get requests/validate/[string nic]() returns boolean|error {
+    isolated resource function get requests/validate/[string nic]() returns boolean|error {
         return checkCitizenHasValidIdentityRequests(nic);
     }
 
@@ -45,23 +45,23 @@ service /identity on new http:Listener(8081) {
         return addRequest(request);
     }
 
-    isolated resource function put requests(UpdateStatusRequest request) returns ()|error {
+    isolated resource function put requests(UpdateStatusRequest request) returns string|error {
         error? changeRequestStatusResult = changeRequestStatus(request.request_id, request.status, request.grama_nic);
         if changeRequestStatusResult is error {
             return changeRequestStatusResult;
         }
         else {
-            return ();
+            return request.request_id;
         }
     }
 
-    isolated resource function delete requests/[string id]() returns ()|error {
+    isolated resource function delete requests/[string id]() returns string |error {
         error? deleteRequestResult = deleteRequest(id);
         if deleteRequestResult is error {
             return deleteRequestResult;
         }
         else {
-            return ();
+            return id;
         }
     }
 

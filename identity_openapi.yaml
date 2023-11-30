@@ -1,0 +1,275 @@
+openapi: 3.0.1
+info:
+  title: Identity
+  version: 0.1.0
+servers:
+- url: "{server}:{port}/identity"
+  variables:
+    server:
+      default: http://localhost
+    port:
+      default: "8081"
+paths:
+  /requests:
+    get:
+      operationId: getRequests
+      parameters:
+      - name: gdid
+        in: query
+        schema:
+          type: string
+          default: ""
+      - name: status
+        in: query
+        schema:
+          type: string
+          default: ""
+      - name: rlimit
+        in: query
+        schema:
+          type: integer
+          format: int64
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdentityRequest'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+    put:
+      operationId: putRequests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+      responses:
+        "200":
+          description: Ok
+          content:
+            text/plain:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+    post:
+      operationId: postRequests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewIdentityRequest'
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityRequest'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+  /requests/{id}:
+    get:
+      operationId: getRequestsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityRequest'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+    delete:
+      operationId: deleteRequestsId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            text/plain:
+              schema:
+                type: string
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+  /requests/validate/{nic}:
+    get:
+      operationId: getRequestsValidateNic
+      parameters:
+      - name: nic
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorPayload'
+components:
+  schemas:
+    IdentityRequest:
+      required:
+      - DOB
+      - NIC
+      - address
+      - applied_date
+      - approved_by
+      - contact_num
+      - email
+      - fullname
+      - gender
+      - grama_divisionId
+      - id
+      - initials_fullname
+      - status
+      type: object
+      properties:
+        id:
+          type: string
+        initials_fullname:
+          type: string
+        fullname:
+          type: string
+        NIC:
+          type: string
+        gender:
+          type: string
+        contact_num:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        DOB:
+          $ref: '#/components/schemas/Utc'
+        applied_date:
+          $ref: '#/components/schemas/Utc'
+        approved_by:
+          type: string
+        status:
+          type: string
+        grama_divisionId:
+          type: string
+    ErrorPayload:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: Reason phrase
+        path:
+          type: string
+          description: Request path
+        method:
+          type: string
+          description: Method type of the request
+        message:
+          type: string
+          description: Error message
+        timestamp:
+          type: string
+          description: Timestamp of the error
+        status:
+          type: integer
+          description: Relevant HTTP status code
+          format: int32
+    UpdateStatusRequest:
+      required:
+      - grama_nic
+      - request_id
+      - status
+      type: object
+      properties:
+        grama_nic:
+          type: string
+        request_id:
+          type: string
+        status:
+          type: string
+    Utc:
+      type: array
+      items:
+        oneOf:
+        - type: integer
+          format: int64
+        - type: number
+          format: double
+    NewIdentityRequest:
+      required:
+      - DOB
+      - NIC
+      - address
+      - contact_num
+      - email
+      - fullname
+      - gender
+      - gramasevaka_division
+      - initials_fullname
+      type: object
+      properties:
+        initials_fullname:
+          type: string
+        fullname:
+          type: string
+        NIC:
+          type: string
+        gender:
+          type: string
+        contact_num:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+        DOB:
+          $ref: '#/components/schemas/Utc'
+        gramasevaka_division:
+          type: string
