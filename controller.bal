@@ -20,18 +20,18 @@ public type UpdateStatusRequest record {|
 |};
 
 service /identity on new http:Listener(8081) {
-    isolated resource function get requests(string gdid = "", string status = "", int rlimit = -1, int offset = -1) returns IdentityRequest[]|error {
+    isolated resource function get requests(string gdid = "", string status = "", int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
         if (gdid != "" && status != "") {
-            return getRequestsByStatusAndGramaDivision(status, gdid);
+            return getRequestsByStatusAndGramaDivision(status, gdid, rlimit, offset);
         }
         else if (status != "") {
-            return getRequestsByStatus(status);
+            return getRequestsByStatus(status, rlimit, offset);
         }
         else if (gdid != "") {
-            return getRequestsByGramaDivision(gdid);
+            return getRequestsByGramaDivision(gdid, rlimit, offset);
         }
         else {
-            return getRequests();
+            return getRequests(rlimit, offset);
         }
     }
     isolated resource function get requests/[string id]() returns IdentityRequest|error {
@@ -55,7 +55,7 @@ service /identity on new http:Listener(8081) {
         }
     }
 
-    isolated resource function delete requests/[string id]() returns string |error {
+    isolated resource function delete requests/[string id]() returns string|error {
         error? deleteRequestResult = deleteRequest(id);
         if deleteRequestResult is error {
             return deleteRequestResult;

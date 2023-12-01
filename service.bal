@@ -1,8 +1,10 @@
+import ballerina/log;
+import ballerina/persist;
+import ballerina/sql;
 import ballerina/time;
 import ballerina/uuid;
+import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
-import ballerina/persist;
-import ballerina/log;
 
 isolated function addRequest(NewIdentityRequest newrequest) returns IdentityRequest|error
 {
@@ -44,15 +46,16 @@ isolated function changeRequestStatus(string request_id, string status, string g
     return ();
 }
 
-isolated function getRequests() returns IdentityRequest[]|error {
-    IdentityRequest[]|error requests = from var request in dbclient->/identityrequests(targetType = IdentityRequest)
-        select request;
-    if requests is error {
-        log:printError("Error while retrieving requests from the database", 'error = requests);
-        return requests;
-    } else {
-        return requests;
-    }
+isolated function getRequests(int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
+    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
+    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    IdentityRequest[] requests = [];
+    check from IdentityRequest request in resultStream
+        do {
+            requests.push(request);
+        };
+    check resultStream.close();
+    return requests;
 }
 
 isolated function getRequest(string id) returns IdentityRequest|error {
@@ -72,41 +75,41 @@ isolated function deleteRequest(string id) returns ()|error {
     return ();
 }
 
-isolated function getRequestsByGramaDivision(string grama_division_id) returns IdentityRequest[]|error {
-    IdentityRequest[]|error requests = from var request in dbclient->/identityrequests(targetType = IdentityRequest)
-        where request.grama_divisionId == grama_division_id
-        select request;
-    if requests is error {
-        log:printError("Error while retrieving requests from the database", 'error = requests);
-        return requests;
-    } else {
-        return requests;
-    }
+isolated function getRequestsByGramaDivision(string grama_division_id, int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
+    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE grama_divisionId = ${grama_division_id} ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
+    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    IdentityRequest[] requests = [];
+    check from IdentityRequest request in resultStream
+        do {
+            requests.push(request);
+        };
+    check resultStream.close();
+    return requests;
 }
 
-isolated function getRequestsByStatus(string status) returns IdentityRequest[]|error {
-    IdentityRequest[]|error requests = from var request in dbclient->/identityrequests(targetType = IdentityRequest)
-        where request.status == status
-        select request;
-    if requests is error {
-        log:printError("Error while retrieving requests from the database", 'error = requests);
-        return requests;
-    } else {
-        return requests;
-    }
+isolated function getRequestsByStatus(string status, int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
+    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE status = ${status} ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
+    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    IdentityRequest[] requests = [];
+    check from IdentityRequest request in resultStream
+        do {
+            requests.push(request);
+        };
+    check resultStream.close();
+    return requests;
 }
 
-isolated function getRequestsByStatusAndGramaDivision(string status, string grama_division_id) returns IdentityRequest[]|error {
-    IdentityRequest[]|error requests = from var request in dbclient->/identityrequests(targetType = IdentityRequest)
-        where request.status == status
-        where request.grama_divisionId == grama_division_id
-        select request;
-    if requests is error {
-        log:printError("Error while retrieving requests from the database", 'error = requests);
-        return requests;
-    } else {
-        return requests;
-    }
+isolated function getRequestsByStatusAndGramaDivision(string status, string grama_division_id, int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
+    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE status = ${status} AND grama_divisionId = ${grama_division_id} ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
+    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    IdentityRequest[] requests = [];
+    check from IdentityRequest request in resultStream
+        do {
+            requests.push(request);
+        };
+    check resultStream.close();
+    return requests;
+
 }
 
 isolated function getRequestsByNIC(string nic) returns IdentityRequest[]|error {
@@ -120,10 +123,11 @@ isolated function getRequestsByNIC(string nic) returns IdentityRequest[]|error {
         return requests;
     }
 }
+
 isolated function checkDateIsLessThanSixMonthsFromNow(time:Utc date) returns boolean|error {
     time:Utc now = time:utcNow();
     time:Utc six_months_ago = time:utcAddSeconds(now, -15768000);
-    if (date<six_months_ago) {
+    if (date < six_months_ago) {
         return false;
     }
     return true;
@@ -146,13 +150,14 @@ isolated function checkCitizenHasValidIdentityRequests(string nic) returns boole
         return false;
     }
     foreach var request in requests {
-        boolean valid =check checkRequestIsValid(request);
+        boolean valid = check checkRequestIsValid(request);
         if (valid) {
             return true;
         }
     }
     return false;
 }
+
 isolated function getGramaDivision(string id) returns GramaDivision|error {
     GramaDivision|error grama_division = dbclient->/gramadivisions/[id];
     if grama_division is error {
@@ -161,6 +166,7 @@ isolated function getGramaDivision(string id) returns GramaDivision|error {
         return grama_division;
     }
 }
+
 isolated function getGramaDivisions() returns GramaDivision[]|error {
     GramaDivision[]|error grama_divisions = from var grama_division in dbclient->/gramadivisions(targetType = GramaDivision)
         select grama_division;
@@ -178,3 +184,6 @@ function initializeDbClient() returns Client|error {
 
 final Client dbclient = check initializeDbClient();
 
+final mysql:Client dbClient = check new (
+    host = host, user = user, password = password, port = port, database = database
+);
