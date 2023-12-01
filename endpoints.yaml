@@ -1,0 +1,30 @@
+endpoints:
+  - name: "Get Identity Requests"
+    path: "/identity/requests"
+    method: "GET"
+    description: "Retrieve identity requests based on parameters"
+  
+  - name: "Get Identity Request by ID"
+    path: "/identity/requests/{id}"
+    method: "GET"
+    description: "Retrieve identity request by ID"
+  
+  - name: "Validate Citizen Identity Requests"
+    path: "/identity/requests/validate/{nic}"
+    method: "GET"
+    description: "Check if citizen has valid identity requests"
+  
+  - name: "Add Identity Request"
+    path: "/identity/requests"
+    method: "POST"
+    description: "Add a new identity request"
+  
+  - name: "Update Request Status"
+    path: "/identity/requests"
+    method: "PUT"
+    description: "Update status of an identity request"
+  
+  - name: "Delete Identity Request by ID"
+    path: "/identity/requests/{id}"
+    method: "DELETE"
+    description: "Delete an identity request by ID"

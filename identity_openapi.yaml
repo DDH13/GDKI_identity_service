@@ -29,11 +29,13 @@ paths:
         schema:
           type: integer
           format: int64
+          default: 10000
       - name: offset
         in: query
         schema:
           type: integer
           format: int64
+          default: 0
       responses:
         "200":
           description: Ok
