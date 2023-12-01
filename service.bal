@@ -48,7 +48,7 @@ isolated function changeRequestStatus(string request_id, string status, string g
 
 isolated function getRequests(int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
     sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
-    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    stream<IdentityRequest, sql:Error?> resultStream = mysqldbClient->query(query);
     IdentityRequest[] requests = [];
     check from IdentityRequest request in resultStream
         do {
@@ -77,7 +77,7 @@ isolated function deleteRequest(string id) returns ()|error {
 
 isolated function getRequestsByGramaDivision(string grama_division_id, int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
     sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE grama_divisionId = ${grama_division_id} ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
-    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    stream<IdentityRequest, sql:Error?> resultStream = mysqldbClient->query(query);
     IdentityRequest[] requests = [];
     check from IdentityRequest request in resultStream
         do {
@@ -89,7 +89,7 @@ isolated function getRequestsByGramaDivision(string grama_division_id, int rlimi
 
 isolated function getRequestsByStatus(string status, int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
     sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE status = ${status} ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
-    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    stream<IdentityRequest, sql:Error?> resultStream = mysqldbClient->query(query);
     IdentityRequest[] requests = [];
     check from IdentityRequest request in resultStream
         do {
@@ -101,7 +101,7 @@ isolated function getRequestsByStatus(string status, int rlimit = 10000, int off
 
 isolated function getRequestsByStatusAndGramaDivision(string status, string grama_division_id, int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
     sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE status = ${status} AND grama_divisionId = ${grama_division_id} ORDER BY applied_date DESC LIMIT ${rlimit} OFFSET ${offset}`;
-    stream<IdentityRequest, sql:Error?> resultStream = dbClient->query(query);
+    stream<IdentityRequest, sql:Error?> resultStream = mysqldbClient->query(query);
     IdentityRequest[] requests = [];
     check from IdentityRequest request in resultStream
         do {
@@ -184,6 +184,6 @@ function initializeDbClient() returns Client|error {
 
 final Client dbclient = check initializeDbClient();
 
-final mysql:Client dbClient = check new (
+final mysql:Client mysqldbClient = check new (
     host = host, user = user, password = password, port = port, database = database
 );
