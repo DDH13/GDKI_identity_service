@@ -4,13 +4,13 @@ COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
 
 # Create a new user
-RUN useradd -ms /bin/bash dineth
+RUN useradd -ms /bin/bash 10001
 
 # Set permissions for the myapp folder
-RUN mkdir /usr/src/myapp && chown -R dineth:dineth /usr/src/myapp
+RUN mkdir /usr/src/myapp && chown -R 10001:10001 /usr/src/myapp
 
 # Switch to the new user
-USER dineth
+USER 10001
 
 RUN ls
 RUN bal persist generate
