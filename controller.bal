@@ -19,6 +19,13 @@ public type UpdateStatusRequest record {|
     string status;
 |};
 
+@http:ServiceConfig {
+    cors: {
+       allowOrigins: ["*"]
+    }
+}
+
+
 service /identity on new http:Listener(8081) {
     isolated resource function get requests(string gdid = "", string status = "", int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
         if (gdid != "" && status != "") {
