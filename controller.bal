@@ -65,4 +65,8 @@ service /identity on new http:Listener(8081) {
         }
     }
 
+    isolated resource function get gramadivisions() returns GramaDivision[]|error {
+        return getGramaDivisions();
+    }
+
 }
