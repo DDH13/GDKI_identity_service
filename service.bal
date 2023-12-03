@@ -38,8 +38,8 @@ isolated function addRequest(NewIdentityRequest newrequest) returns IdentityRequ
 
 }
 
-isolated function changeRequestStatus(string request_id, string status, string grama_id) returns ()|error {
-    IdentityRequest|error updated = dbclient->/identityrequests/[request_id].put({status: status, approved_by: grama_id});
+isolated function changeRequestStatus(string request_id, string status, string grama_name) returns ()|error {
+    IdentityRequest|error updated = dbclient->/identityrequests/[request_id].put({status: status, approved_by: grama_name});
     if (updated is error) {
         return updated;
     }
