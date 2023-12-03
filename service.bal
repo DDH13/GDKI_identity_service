@@ -158,6 +158,21 @@ isolated function checkCitizenHasValidIdentityRequests(string nic) returns boole
     return false;
 }
 
+isolated function getLatestApprovedRequest(string nic) returns IdentityRequest|error {
+    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE NIC = ${nic} AND status = "Cleared" ORDER BY applied_date DESC LIMIT 1`;
+    stream<IdentityRequest, sql:Error?> resultStream = mysqldbClient->query(query);
+    IdentityRequest[] requests = [];
+    check from IdentityRequest request in resultStream
+        do {
+            requests.push(request);
+        };
+    check resultStream.close();
+    if (requests.length() == 0 || !(check checkRequestIsValid(requests[0]))) {
+        return error ("No approved requests found for the given NIC");
+    }
+    return requests[0];
+}
+
 isolated function getGramaDivision(string id) returns GramaDivision|error {
     GramaDivision|error grama_division = dbclient->/gramadivisions/[id];
     if grama_division is error {

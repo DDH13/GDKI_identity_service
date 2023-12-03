@@ -21,10 +21,9 @@ public type UpdateStatusRequest record {|
 
 @http:ServiceConfig {
     cors: {
-       allowOrigins: ["*"]
+        allowOrigins: ["*"]
     }
 }
-
 
 service /identity on new http:Listener(8081) {
     isolated resource function get requests(string gdid = "", string status = "", int rlimit = 10000, int offset = 0) returns IdentityRequest[]|error {
@@ -46,6 +45,9 @@ service /identity on new http:Listener(8081) {
     }
     isolated resource function get requests/nic/[string nic]() returns IdentityRequest[]|error {
         return getRequestsByNIC(nic);
+    }
+    isolated resource function get requests/latest/[string nic]() returns IdentityRequest|error {
+        return getLatestApprovedRequest(nic);
     }
     isolated resource function get requests/validate/[string nic]() returns boolean|error {
         return checkCitizenHasValidIdentityRequests(nic);
