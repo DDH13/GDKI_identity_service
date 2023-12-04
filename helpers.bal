@@ -5,6 +5,7 @@ import ballerina/time;
 import ballerina/uuid;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerinax/vonage.sms as vs;
 
 isolated function addRequest(NewIdentityRequest newrequest) returns IdentityRequest|error
 {
@@ -38,11 +39,13 @@ isolated function addRequest(NewIdentityRequest newrequest) returns IdentityRequ
 
 }
 
-isolated function changeRequestStatus(string request_id, string status, string grama_name) returns ()|error {
+isolated function changeRequestStatus(string request_id, string status, string grama_name, vs:Client vsClient) returns ()|error {
     IdentityRequest|error updated = dbclient->/identityrequests/[request_id].put({status: status, approved_by: grama_name});
     if (updated is error) {
         return updated;
     }
+    // Send SMS
+    string _ = check sendSms(vsClient, updated);
     return ();
 }
 
@@ -202,3 +205,45 @@ final Client dbclient = check initializeDbClient();
 final mysql:Client mysqldbClient = check new (
     host = host, user = user, password = password, port = port, database = database
 );
+
+
+//Vonage SMS provider
+configurable string api_key = ?;
+configurable string api_secret = ?;
+configurable string vonageServiceUrl = "https://rest.nexmo.com/sms";
+
+isolated function sendSms(vs:Client vsClient, IdentityRequest request) returns string|error {
+    //isolated function sendSms(vs:Client vsClient, Citizen citizen, PoliceRequest request) returns string|error {
+    //string user_contactNumber = check dbclient->/citizens/[citizen.id].contactNumber;
+    string sms_message = "Your identity request with ID " + request.id + " has been " + request.status + ".";
+
+    vs:NewMessage message = {
+        api_key: api_key,
+        'from: "Vonage APIs",
+        to:"+94764378939",        //to: user_contactNumber,
+        api_secret: api_secret,
+        text: sms_message
+    };
+
+    vs:InlineResponse200|error response = vsClient->sendAnSms(message);
+
+    if response is error {
+        log:printError("Error sending SMS: ", err = response.message());
+    }
+
+    return sms_message;
+}
+
+function initializeVsClient() returns vs:Client | error {
+    // Initialize Vonage/Nexmo client
+    vs:ConnectionConfig smsconfig = {};
+    return check new vs:Client(smsconfig, serviceUrl = vonageServiceUrl);
+}
+
+vs:Client vsClient = check initializeVsClient();
+
+isolated function getVsClient() returns vs:Client | error {
+    // Initialize Vonage/Nexmo client
+    vs:ConnectionConfig smsconfig = {};
+    return check new vs:Client(smsconfig, serviceUrl = vonageServiceUrl);
+}
