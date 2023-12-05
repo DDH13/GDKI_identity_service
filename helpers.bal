@@ -162,7 +162,7 @@ isolated function checkCitizenHasValidIdentityRequests(string nic) returns boole
 }
 
 isolated function getLatestApprovedRequest(string nic) returns IdentityRequest|error {
-    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE NIC = ${nic} AND status = "Cleared" ORDER BY applied_date DESC LIMIT 1`;
+    sql:ParameterizedQuery query = `SELECT * FROM IdentityRequest WHERE NIC = ${nic} AND status = 'Verified' ORDER BY applied_date DESC LIMIT 1`;
     stream<IdentityRequest, sql:Error?> resultStream = mysqldbClient->query(query);
     IdentityRequest[] requests = [];
     check from IdentityRequest request in resultStream
