@@ -26,7 +26,7 @@ CREATE TABLE `IdentityRequest` (
 	`address` VARCHAR(191) NOT NULL,
 	`DOB` TIMESTAMP NOT NULL,
 	`applied_date` TIMESTAMP NOT NULL,
-	`approved_date` TIMESTAMP,
+	`approved_date` TIMESTAMP NOT NULL,
 	`approved_by` VARCHAR(191) NOT NULL,
 	`status` VARCHAR(191) NOT NULL,
 	`grama_divisionId` VARCHAR(191) NOT NULL,

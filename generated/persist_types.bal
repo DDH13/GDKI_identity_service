@@ -14,7 +14,7 @@ public type IdentityRequest record {|
     string address;
     time:Utc DOB;
     time:Utc applied_date;
-    time:Utc? approved_date;
+    time:Utc approved_date;
     string approved_by;
     string status;
     string grama_divisionId;
@@ -31,7 +31,7 @@ public type IdentityRequestOptionalized record {|
     string address?;
     time:Utc DOB?;
     time:Utc applied_date?;
-    time:Utc? approved_date?;
+    time:Utc approved_date?;
     string approved_by?;
     string status?;
     string grama_divisionId?;
@@ -56,7 +56,7 @@ public type IdentityRequestUpdate record {|
     string address?;
     time:Utc DOB?;
     time:Utc applied_date?;
-    time:Utc? approved_date?;
+    time:Utc approved_date?;
     string approved_by?;
     string status?;
     string grama_divisionId?;
