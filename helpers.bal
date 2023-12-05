@@ -216,11 +216,11 @@ isolated function sendSms(vs:Client vsClient, IdentityRequest request) returns s
     //isolated function sendSms(vs:Client vsClient, Citizen citizen, PoliceRequest request) returns string|error {
     //string user_contactNumber = check dbclient->/citizens/[citizen.id].contactNumber;
     string sms_message = "Your identity request with ID " + request.id + " has been " + request.status + ".";
-
+    
     vs:NewMessage message = {
         api_key: api_key,
         'from: "Vonage APIs",
-        to:"+94764378939",        //to: user_contactNumber,
+        to:request.contact_num,        //to: user_contactNumber,
         api_secret: api_secret,
         text: sms_message
     };
