@@ -33,6 +33,7 @@ public isolated client class Client {
                 address: {columnName: "address"},
                 DOB: {columnName: "DOB"},
                 applied_date: {columnName: "applied_date"},
+                approved_date: {columnName: "approved_date"},
                 approved_by: {columnName: "approved_by"},
                 status: {columnName: "status"},
                 grama_divisionId: {columnName: "grama_divisionId"},
@@ -64,6 +65,7 @@ public isolated client class Client {
                 "identityrequest[].address": {relation: {entityName: "identityrequest", refField: "address"}},
                 "identityrequest[].DOB": {relation: {entityName: "identityrequest", refField: "DOB"}},
                 "identityrequest[].applied_date": {relation: {entityName: "identityrequest", refField: "applied_date"}},
+                "identityrequest[].approved_date": {relation: {entityName: "identityrequest", refField: "approved_date"}},
                 "identityrequest[].approved_by": {relation: {entityName: "identityrequest", refField: "approved_by"}},
                 "identityrequest[].status": {relation: {entityName: "identityrequest", refField: "status"}},
                 "identityrequest[].grama_divisionId": {relation: {entityName: "identityrequest", refField: "grama_divisionId"}}

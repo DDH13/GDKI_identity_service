@@ -27,6 +27,7 @@ isolated function addRequest(NewIdentityRequest newrequest) returns IdentityRequ
         gender: newrequest.gender,
         grama_divisionId: newrequest.gramasevaka_division,
         applied_date: time:utcNow(),
+        approved_date: time:utcNow(),
         email: newrequest.email,
         status: "Pending"
     };
@@ -40,7 +41,7 @@ isolated function addRequest(NewIdentityRequest newrequest) returns IdentityRequ
 }
 
 isolated function changeRequestStatus(string request_id, string status, string grama_name, vs:Client vsClient) returns ()|error {
-    IdentityRequest|error updated = dbclient->/identityrequests/[request_id].put({status: status, approved_by: grama_name});
+    IdentityRequest|error updated = dbclient->/identityrequests/[request_id].put({status: status, approved_by: grama_name, approved_date: time:utcNow()});
     if (updated is error) {
         return updated;
     }
