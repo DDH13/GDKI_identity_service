@@ -1,5 +1,6 @@
 import ballerina/http;
 import ballerina/time;
+import ballerinax/vonage.sms as vs;
 
 public type NewIdentityRequest record {|
     string initials_fullname;
@@ -58,7 +59,9 @@ service /identity on new http:Listener(8081) {
     }
 
     isolated resource function put requests(UpdateStatusRequest request) returns string|error {
-        error? changeRequestStatusResult = changeRequestStatus(request.request_id, request.status, request.grama_name);
+        vs:Client vsClient = check getVsClient();
+
+        error? changeRequestStatusResult = changeRequestStatus(request.request_id, request.status, request.grama_name, vsClient);
         if changeRequestStatusResult is error {
             return changeRequestStatusResult;
         }
