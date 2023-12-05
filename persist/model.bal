@@ -12,7 +12,7 @@ public type IdentityRequest record {|
     string address;
     time:Utc DOB;
     time:Utc applied_date;
-    time:Utc? approved_date;
+    time:Utc approved_date;
     string approved_by;
     string status;
     GramaDivision grama_division;
